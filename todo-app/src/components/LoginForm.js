@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { error } from "jquery";
 import Auth from "../stores/Auth.js";
 import { useHistory, Link } from "react-router-dom";
-import Helper from "../stores/Helper";
+import AuthService from "../services/authService.js";
 
 function LoginForm(props) {
   const history = useHistory();
@@ -19,26 +18,12 @@ function LoginForm(props) {
   }
 
   function login() {
-    fetch(
-      Helper.API_URL + Helper.LOGIN_URL,
-      Helper.RequestOptions("POST", JSON.stringify({ username, password }))
-    )
-      .then((response) => {
-        if (response.status === 200) {
-          return response.json();
-        } else {
-          Auth.removeToken();
-          alert("Username or password is wrong.");
-          error();
-        }
-      })
-      .then((data) => {
-        Auth.setToken(data);
+    AuthService.signIn(username, password).then((token) => {
+      if (token) {
+        Auth.setToken(token);
         history.push("/Main");
-      })
-      .catch((error) => {
-        console.log("An error occured", error);
-      });
+      }
+    });
   }
   return (
     <div>

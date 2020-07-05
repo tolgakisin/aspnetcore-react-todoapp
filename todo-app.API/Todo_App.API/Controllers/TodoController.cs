@@ -34,32 +34,6 @@ namespace Todo_App.API.Controllers
             }
         }
 
-        [HttpGet("TodosByDone")]
-        public IActionResult GetTodosByDone()
-        {
-            using (TodoContext _context = new TodoContext())
-            {
-                var userId = User.FindFirstValue(ClaimTypes.Name);
-                List<Todo> todos = _context.Todos.Where(t => !t.IsDeleted && t.IsDone && t.UserId == Convert.ToInt32(userId)).ToList();
-                List<TodosVM> todoList = _mapper.Map<List<TodosVM>>(todos);
-
-                return Ok(JsonConvert.SerializeObject(todoList));
-            }
-        }
-
-        [HttpGet("TodosByNotDone")]
-        public IActionResult GetTodosByNotDone()
-        {
-            using (TodoContext _context = new TodoContext())
-            {
-                var userId = User.FindFirstValue(ClaimTypes.Name);
-                List<Todo> todos = _context.Todos.Where(t => !t.IsDeleted && !t.IsDone && t.UserId == Convert.ToInt32(userId)).ToList();
-                List<TodosVM> todoList = _mapper.Map<List<TodosVM>>(todos);
-
-                return Ok(JsonConvert.SerializeObject(todoList));
-            }
-        }
-
         [HttpPost("ConfirmTodo/{id:int:min(1)}")]
         public IActionResult ConfirmTodo(int? id)
         {
@@ -73,8 +47,12 @@ namespace Todo_App.API.Controllers
 
                 try
                 {
-                    todo.IsDone = true;
-                    todo.DoneDate = DateTime.Now;
+                    todo.IsDone = !todo.IsDone;
+                    if (todo.IsDone)
+                        todo.DoneDate = DateTime.Now;
+                    else
+                        todo.DoneDate = default(DateTime);
+
                     _context.SaveChanges();
 
                     return Ok();

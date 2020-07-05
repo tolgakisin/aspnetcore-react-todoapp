@@ -7,14 +7,12 @@ function Todo(props) {
         <li className="list-group-item d-flex justify-content-between align-items-center">
           {item.Content}
           <div className="">
-            {item.IsDone !== true && (
-              <button
-                className="badge badge-primary badge-pill btn btn-success mr-3"
-                onClick={() => props.handleConfirm(item.Id)}
-              >
-                Done
-              </button>
-            )}
+            <button
+              className="badge badge-primary badge-pill btn btn-success mr-3"
+              onClick={() => props.handleConfirm(item.Id)}
+            >
+              {item.IsDone !== true ? "Done" : "Undone"}
+            </button>
 
             <button
               className="badge badge-primary badge-pill btn btn-danger"

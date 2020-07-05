@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Helper from "../stores/Helper";
 import { useHistory, Link } from "react-router-dom";
+import AuthService from "../services/authService";
 
 function RegisterForm(props) {
   const history = useHistory();
@@ -23,6 +23,20 @@ function RegisterForm(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
+
+    AuthService.register(fields.username, fields.password).then((response) => {
+      if (response.status === 200) {
+        setIsRegistered(true);
+        setTimeout(() => {
+          history.push("/");
+        }, 2000);
+      } else if (response.status === 409) {
+        setIsExist(true);
+      } else {
+        setIsRegistered(false);
+      }
+    });
+
     setFields({
       username: "",
       password: "",
@@ -30,27 +44,6 @@ function RegisterForm(props) {
     });
     setIsRegistered("");
     setIsExist(false);
-
-    fetch(
-      Helper.API_URL + Helper.REGISTER_URL,
-      Helper.RequestOptions(
-        "POST",
-        JSON.stringify({ Username: fields.username, Password: fields.password })
-      )
-    )
-      .then((response) => {
-        if (response.status === 200) {
-          setIsRegistered(true);
-          setTimeout(() => {
-            history.push("/");
-          }, 2000);
-        } else if (response.status === 409) {
-          setIsExist(true);
-        } else {
-          setIsRegistered(false);
-        }
-      })
-      .catch((error) => alert("An unexpected error occured."));
   }
 
   function handleChange(e) {
